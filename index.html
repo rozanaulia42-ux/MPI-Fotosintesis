@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Media Pembelajaran Interaktif - Fotosintesis Tumbuhan Hijau</title>
+    <style>
+        /* */
+        :root {
+            --primary: #0d47a1;
+            --primary-light: #1976d2;
+            --primary-dark: #002171;
+            --accent: #ffb300;
+            --bg-light: #f4f7fb;
+            --bg-card: #ffffff;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --success: #2e7d32;
+            --error: #c62828;
+            --sidebar-w: 280px;
+            --radius: 16px;
+            --shadow: 0 8px 24px rgba(13, 71, 161, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-light: #121212;
+            --bg-card: #1e1e1e;
+            --text-dark: #f0f0f0;
+            --text-muted: #aaaaaa;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --primary: #1976d2;
+            --primary-light: #42a5f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); overflow-x: hidden; transition: var(--transition); }
+        
+        /* */
+        h1, h2, h3, h4 { color: var(--primary); margin-bottom: 12px; font-weight: 700; }
+        [data-theme="dark"] h1, [data-theme="dark"] h2 { color: var(--primary-light); }
+        p { line-height: 1.6; margin-bottom: 16px; font-size: 1.1rem; }
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 1rem; }
+        .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-1 { gap: 0.5rem; } .gap-2 { gap: 1rem; } .gap-3 { gap: 1.5rem; }
+        
+        .btn {
+            background: var(--bg-card); color: var(--text-dark); border: 2px solid var(--primary-light);
+            padding: 12px 24px; border-radius: var(--radius); cursor: pointer; font-size: 1rem; font-weight: 600;
+            transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .btn:hover, .btn:focus { background: var(--primary-light); color: white; transform: translateY(-2px); outline: none; }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-accent { background: var(--accent); color: #000; border-color: var(--accent); }
+        .btn-icon { padding: 10px; border-radius: 50%; border: none; background: var(--primary-light); color: white; width: 44px; height: 44px; }
+        
+        /* */
+        .card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: var(--transition); }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(13, 71, 161, 0.15); }
+        
+        #app { display: flex; height: 100vh; overflow: hidden; }
+        
+        #sidebar {
+            width: var(--sidebar-w); background: var(--bg-card); border-right: 1px solid rgba(13, 71, 161, 0.1);
+            display: flex; flex-direction: column; z-index: 100; transition: var(--transition); flex-shrink: 0;
+        }
+        .sidebar-header { padding: 24px; text-align: center; border-bottom: 1px solid rgba(13, 71, 161, 0.1); }
+        .sidebar-header h2 { font-size: 1.2rem; margin: 0; color: var(--primary); }
+        .nav-menu { flex: 1; overflow-y: auto; padding: 16px 0; }
+        .nav-item {
+            padding: 12px 24px; margin: 4px 16px; border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; gap: 12px; font-weight: 500; transition: var(--transition); color: var(--text-dark);
+        }
+        .nav-item:hover { background: rgba(25, 118, 210, 0.1); color: var(--primary); }
+        .nav-item.active { background: var(--primary); color: white; }
+        
+        #main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        #topbar {
+            height: 70px; background: var(--bg-card); padding: 0 24px; display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 10;
+        }
+        #content-area { flex: 1; overflow-y: auto; padding: 32px; position: relative; scroll-behavior: smooth; }
+        .page { display: none; animation: fadeIn 0.4s ease forwards; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* */
+        .progress-container { background: #e0e0e0; border-radius: 10px; height: 16px; overflow: hidden; margin: 16px 0; }
+        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease; }
+        [data-theme="dark"] .progress-container { background: #333; }
+        
+        .pid-stimulus {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: white;
+            padding: 24px; border-radius: var(--radius); margin: 24px 0; text-align: center; border: 4px solid var(--accent);
+            box-shadow: 0 8px 0 var(--primary-dark);
+        }
+        .pid-stimulus h3 { color: white; font-size: 1.5rem; }
+        
+        .sim-container { display: flex; flex-direction: column; gap: 24px; align-items: center; margin: 24px 0; }
+        .sim-plant { width: 200px; height: 200px; transition: var(--transition); }
+        .sim-controls { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+        .sim-btn { padding: 16px 24px; font-size: 1.2rem; border-radius: 50px; }
+        .sim-btn.active { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
+        
+        .quiz-section { display: none; }
+        .quiz-section.active { display: block; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .match-container { display: flex; justify-content: space-between; gap: 20px; }
+        .match-col { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .match-item { padding: 16px; border: 2px dashed var(--primary); border-radius: 8px; cursor: pointer; text-align: center; }
+        .match-item.selected { background: var(--primary-light); color: white; }
+        .match-item.matched { background: var(--success); color: white; border-style: solid; pointer-events: none; }
+        .drop-zone { min-height: 60px; border: 2px dashed var(--text-muted); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-top: 10px; }
+        .drag-item { display: inline-block; padding: 10px 20px; background: var(--primary); color: white; border-radius: 50px; cursor: grab; margin: 5px; }
+        .sort-container { display: flex; flex-wrap: wrap; gap: 10px; min-height: 60px; padding: 16px; background: rgba(0,0,0,0.05); border-radius: 8px; }
+        
+        .floating-tools { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 12px; z-index: 90; }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--bg-card); padding: 32px; border-radius: var(--radius); max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .leaf { position: absolute; width: 20px; height: 20px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234CAF50"><path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 7,14 7,14C10,9 15,9.5 15,9.5L17,8Z"/></svg>'); background-size: cover; animation: fall linear infinite; opacity: 0.5; }
+        @keyframes fall { 0% { transform: translateY(-20px) rotate(0deg); } 100% { transform: translateY(100vh) rotate(360deg); } }
+
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); color: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s;
+        }
+        .spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .mobile-toggle { display: none; }
+        @media (max-width: 900px) {
+            #sidebar { position: absolute; height: 100%; transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); box-shadow: 100px 0 0 rgba(0,0,0,0.5); }
+            .mobile-toggle { display: block; }
+            .options-grid { grid-template-columns: 1fr; }
+            .match-container { flex-direction: column; }
+        }
+        @media (max-width: 600px) {
+            #content-area { padding: 16px; }
+            .btn { width: 100%; margin-bottom: 8px; justify-content: center; }
+            .pid-stimulus { padding: 16px; }
+            h1 { font-size: 1.5rem; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            #topbar { height: 50px; }
+            #sidebar { width: 220px; }
+            .sidebar-header { padding: 10px; }
+        }
+
+        .hidden { display: none !important; }
+        .text-xl { font-size: 1.25rem; } .font-bold { font-weight: bold; }
+        .mt-2 { margin-top: 1rem; } .mt-4 { margin-top: 2rem; }
+        .badge { display: inline-block; padding: 4px 12px; background: var(--accent); color: black; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-left: 8px;}
+        @media (max-width: 600px) {
+            .hidden-mobile { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <h2>Memuat Media Pembelajaran...</h2>
+        <p>Materi Fotosintesis Tumbuhan Hijau</p>
+    </div>
+
+    <!-- Background Particles -->
+    <div id="particles"></div>
+
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h2>🌱 Biologi Kelas 5</h2>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <!-- Injected via JS -->
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Top Bar -->
+            <header id="topbar">
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-icon mobile-toggle" onclick="toggleSidebar()" title="Menu">☰</button>
+                    <!-- -->
+                    <button class="btn btn-primary flex items-center gap-1" onclick="goToPage(0)" title="Kembali ke Beranda" style="padding: 8px 16px;">
+                        <span>🏠</span> <span class="hidden-mobile">Beranda</span>
+                    </button>
+                    <span id="realtime-clock" class="font-bold text-muted hidden-mobile"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-icon" onclick="toggleAudio()" id="btnAudio" title="Musik Latar">🔇</button>
+                    <button class="btn btn-icon" onclick="toggleTheme()" title="Mode Gelap/Terang">🌓</button>
+                    <button class="btn btn-icon" onclick="toggleFullscreen()" title="Layar Penuh">⛶</button>
+                </div>
+            </header>
+
+            <!-- Pages Container -->
+            <div id="content-area">
+                
+                <!-- PAGE 0: BERANDA -->
+                <section id="page-0" class="page active">
+                    <div class="card text-center mb-2">
+                        <h1 style="font-size: 2.5rem; color: var(--primary-dark);">MEDIA PEMBELAJARAN INTERAKTIF</h1>
+                        <h2 style="color: var(--primary-light); font-size: 1.8rem;">FOTOSINTESIS TUMBUHAN HIJAU</h2>
+                        <div class="flex justify-center items-center gap-2 flex-wrap mb-2">
+                            <span class="badge" style="font-size: 1.2rem; padding: 8px 24px; margin-left: 0;">Kelas 5 SD</span>
+                        </div>
+                        <p style="font-size: 1.15rem; color: var(--text-muted); margin-top: 12px; margin-bottom: 0;">
+                            Pengembang: <strong style="color: var(--primary-light); font-size: 1.25rem;">Roza Naulia Rosdianti</strong>
+                        </p>
+                    </div>
+
+                    <div class="card flex flex-wrap items-center justify-center gap-3 mb-2" style="background: linear-gradient(to bottom, #87CEEB, #E0F7FA);">
+                        <svg width="300" height="250" viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Sun -->
+                            <circle cx="50" cy="50" r="30" fill="#FFD700">
+                                <animate attributeName="r" values="30;35;30" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <line x1="50" y1="10" x2="50" y2="0" stroke="#FFD700" stroke-width="4"/>
+                            <line x1="50" y1="90" x2="50" y2="100" stroke="#FFD700" stroke-width="4"/>
+                            <line x1="10" y1="50" x2="0" y2="50" stroke="#FFD700" stroke-width="4"/>
+                            <line x1="90" y1="50" x2="100" y2="50" stroke="#FFD700" stroke-width="4"/>
+                            <!-- Rays -->
+                            <path d="M 70 70 L 120 120" stroke="#FFD700" stroke-width="3" stroke-dasharray="5,5">
+                                <animate attributeName="stroke-dashoffset" from="20" to="0" dur="1s" repeatCount="indefinite"/>
+                            </path>
+                            <!-- Plant -->
+                            <path d="M 150 220 Q 150 150 150 120" stroke="#4CAF50" stroke-width="8" fill="none"/>
+                            <!-- Leaves -->
+                            <path d="M 150 160 Q 100 140 120 110 Q 150 130 150 160" fill="#4CAF50"/>
+                            <path d="M 150 140 Q 200 120 180 90 Q 150 110 150 140" fill="#4CAF50"/>
+                            <!-- Roots -->
+                            <path d="M 150 220 L 130 240 M 150 220 L 150 250 M 150 220 L 170 240" stroke="#8B4513" stroke-width="4"/>
+                            <!-- Water Drops -->
+                            <circle cx="130" cy="230" r="4" fill="#2196F3"><animate attributeName="cy" values="250;210" dur="2s" repeatCount="indefinite" opacity="0;1;0"/></circle>
+                            <circle cx="170" cy="230" r="4" fill="#2196F3"><animate attributeName="cy" values="240;200" dur="2.5s" repeatCount="indefinite" opacity="0;1;0"/></circle>
+                            <!-- CO2 & O2 Text -->
+                            <text x="180" y="160" fill="#666" font-family="Arial" font-weight="bold" font-size="14">CO₂ Masuk</text>
+                            <text x="70" y="140" fill="#2196F3" font-family="Arial" font-weight="bold" font-size="14">O₂ Keluar</text>
+                        </svg>
+                        <div style="max-width: 400px; padding: 20px;">
+                            <h3 style="color: var(--text-dark)">Progress Belajarmu</h3>
+                            <p>Jumlah Siswa di Kelas: <strong>20 Siswa</strong></p>
+                            <div class="progress-container">
+                                <div class="progress-bar" id="main-progress"></div>
+                            </div>
+                            <p class="flex justify-between">
+                                <span id="progress-text">Materi Dipelajari: 0/9</span>
+                                <span id="progress-percent">0%</span>
+                            </p>
+                            <div class="mt-2 flex gap-1 flex-wrap">
+                                <button class="btn btn-primary" onclick="startLearning()">🚀 Mulai Belajar</button>
+                                <button class="btn" onclick="resetProgress()" style="font-size: 0.9rem;">🔄 Reset Progress</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PAGE 1: PENGERTIAN -->
+                <section id="page-1" class="page">
+                    <div class="card mb-2">
+                        <h1>📘 Pengertian Fotosintesis</h1>
+                        <p class="badge">Tujuan: Menjelaskan pengertian fotosintesis</p>
+                        <div class="flex flex-wrap gap-2 items-center mt-2">
+                            <div style="flex:1; min-width: 300px;">
+                                <p class="text-xl"><strong>Fotosintesis</strong> adalah proses luar biasa di mana tumbuhan hijau membuat makanan mereka sendiri.</p>
+                                <p>Layaknya seorang koki, tumbuhan menggunakan bahan-bahan dari alam seperti cahaya matahari, air, dan karbon dioksida untuk memasak makanannya.</p>
+                                <div style="background: rgba(255,179,0,0.1); padding: 16px; border-left: 4px solid var(--accent); border-radius: 4px;">
+                                    <strong>💡 Fakta Menarik:</strong> Kata "Fotosintesis" berasal dari bahasa Yunani. "Foto" berarti cahaya, dan "Sintesis" berarti menggabungkan!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pid-stimulus">
+                        <h3>🎤 Diskusi Kelas (PID)</h3>
+                        <p style="font-size: 1.5rem; margin-top: 16px;">"Mengapa tumbuhan tetap bisa hidup dan tumbuh besar walaupun tidak pernah diberi makan seperti manusia atau hewan peliharaan?"</p>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2">
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(2)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 2: TEMPAT -->
+                <section id="page-2" class="page">
+                    <div class="card mb-2">
+                        <h1>🌿 Tempat Terjadinya Fotosintesis</h1>
+                        <p class="badge">Tujuan: Mengidentifikasi bagian tumbuhan</p>
+                        <p class="mt-2 text-xl">Dapur utama tempat tumbuhan memasak makanan terletak di <strong>Daun</strong>.</p>
+                        <div class="flex flex-wrap gap-3 mt-2 justify-center">
+                            <div style="flex: 1; min-width: 250px;">
+                                <ul style="margin-left: 20px; line-height: 2; font-size: 1.2rem;">
+                                    <li><strong>Daun:</strong> Memiliki permukaan lebar untuk menangkap cahaya.</li>
+                                    <li><strong>Kloroplas:</strong> Ruangan kecil di dalam daun tempat proses memasak terjadi.</li>
+                                    <li><strong>Klorofil:</strong> Zat warna hijau daun yang ajaib, berfungsi menyerap energi dari cahaya matahari!</li>
+                                </ul>
+                            </div>
+                            <svg width="200" height="200" viewBox="0 0 100 100">
+                                <path d="M 50 90 Q 20 70 30 30 Q 50 10 70 30 Q 80 70 50 90" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+                                <path d="M 50 90 L 50 10" stroke="#2E7D32" stroke-width="2" fill="none"/>
+                                <path d="M 50 70 L 35 60 M 50 50 L 35 40 M 50 30 L 40 25" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+                                <path d="M 50 65 L 65 55 M 50 45 L 65 35 M 50 25 L 60 20" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="pid-stimulus">
+                        <h3>👆 Aktivitas PID</h3>
+                        <p style="font-size: 1.3rem;">"Maju ke depan dan sentuh bagian tumbuhan pada gambar di bawah yang paling banyak melakukan fotosintesis!"</p>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2">
+                        <button class="btn" onclick="goToPage(1)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(3)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 3: BAHAN -->
+                <section id="page-3" class="page">
+                    <div class="card mb-2">
+                        <h1>☀️ Bahan yang Dibutuhkan</h1>
+                        <p class="badge">Tujuan: Menyebutkan bahan fotosintesis</p>
+                        <p class="mt-2 text-xl text-center">Klik kartu di bawah ini untuk melihat bahan-bahan resep rahasia tumbuhan!</p>
+                        
+                        <div class="options-grid mt-4">
+                            <div class="card text-center" style="cursor:pointer; border: 2px solid var(--primary-light);" onclick="revealText('bahan-1')">
+                                <div style="font-size: 3rem;">☀️</div>
+                                <h3>Cahaya Matahari</h3>
+                                <p id="bahan-1" class="hidden" style="color: var(--primary-dark); font-weight: bold;">Sumber energi utama yang menyalakan mesin pembuat makanan.</p>
+                            </div>
+                            <div class="card text-center" style="cursor:pointer; border: 2px solid var(--primary-light);" onclick="revealText('bahan-2')">
+                                <div style="font-size: 3rem;">💧</div>
+                                <h3>Air</h3>
+                                <p id="bahan-2" class="hidden" style="color: var(--primary-dark); font-weight: bold;">Diserap oleh akar dari dalam tanah dan dibawa naik ke daun.</p>
+                            </div>
+                            <div class="card text-center" style="cursor:pointer; border: 2px solid var(--primary-light);" onclick="revealText('bahan-3')">
+                                <div style="font-size: 3rem;">🌫️</div>
+                                <h3>Karbon Dioksida</h3>
+                                <p id="bahan-3" class="hidden" style="color: var(--primary-dark); font-weight: bold;">Gas di udara yang dihembuskan manusia, diserap daun melalui stomata (mulut daun).</p>
+                            </div>
+                            <div class="card text-center" style="cursor:pointer; border: 2px solid var(--primary-light);" onclick="revealText('bahan-4')">
+                                <div style="font-size: 3rem;">🍃</div>
+                                <h3>Klorofil</h3>
+                                <p id="bahan-4" class="hidden" style="color: var(--primary-dark); font-weight: bold;">Zat hijau daun yang bertugas menangkap cahaya matahari.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pid-stimulus">
+                        <h3>❓ Pertanyaan Cepat</h3>
+                        <p style="font-size: 1.3rem;">"Apa yang akan terjadi pada tumbuhan hijau jika diletakkan di dalam lemari gelap berhari-hari?"</p>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2 mt-2">
+                        <button class="btn" onclick="goToPage(2)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(4)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 4: PROSES (SIMULASI INTERAKTIF) -->
+                <section id="page-4" class="page">
+                    <div class="card mb-2">
+                        <h1>🔄 Proses Fotosintesis</h1>
+                        <p class="badge">Tujuan: Menjelaskan proses secara sederhana</p>
+                        
+                        <div style="background: var(--bg-light); padding: 16px; border-radius: 8px; text-align: center; margin-top:16px;">
+                            <h3 style="color: var(--error)">Rumus Ajaib Tumbuhan:</h3>
+                            <p style="font-size: 1.2rem; font-weight: bold;">Karbon Dioksida + Air + (Bantuan Cahaya & Klorofil) ➔ Glukosa + Oksigen</p>
+                        </div>
+
+                        <h3 class="text-center mt-4">🎮 Simulasi Interaktif</h3>
+                        <p class="text-center">Berikan bahan yang tepat untuk membantu daun ini melakukan fotosintesis!</p>
+                        
+                        <div class="sim-container">
+                            <svg class="sim-plant" id="sim-svg" viewBox="0 0 100 100">
+                                <path id="sim-leaf" d="M 50 90 Q 20 70 30 30 Q 50 10 70 30 Q 80 70 50 90" fill="#9E9E9E" stroke="#616161" stroke-width="2" style="transition: fill 1s;"/>
+                                <path d="M 50 90 L 50 10" stroke="#616161" stroke-width="2" fill="none"/>
+                            </svg>
+                            <div id="sim-result" style="font-size: 1.5rem; font-weight: bold; height: 30px; color: var(--text-muted);">Menunggu bahan...</div>
+                            <div class="sim-controls">
+                                <button class="btn sim-btn" id="btn-cahaya" onclick="toggleSim('cahaya')">☀️ Tambah Cahaya</button>
+                                <button class="btn sim-btn" id="btn-air" onclick="toggleSim('air')">💧 Tambah Air</button>
+                                <button class="btn sim-btn" id="btn-co2" onclick="toggleSim('co2')">🌫️ Tambah CO₂</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2">
+                        <button class="btn" onclick="goToPage(3)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(5)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 5: HASIL -->
+                <section id="page-5" class="page">
+                    <div class="card mb-2">
+                        <h1>🍃 Hasil Fotosintesis</h1>
+                        <p class="badge">Tujuan: Menyebutkan hasil fotosintesis</p>
+                        <p class="mt-2 text-xl">Setelah selesai memasak, apa yang dihasilkan tumbuhan?</p>
+                        
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            <div class="card" style="flex: 1; border: 2px solid var(--accent); background: rgba(255,179,0,0.05);">
+                                <h2 class="text-center">🍞 Makanan (Glukosa)</h2>
+                                <p>Zat gula/karbohidrat. Ini adalah makanan bagi tumbuhan untuk hidup dan tumbuh. Kelebihannya disimpan di buah, akar (seperti singkong), atau batang (seperti tebu).</p>
+                            </div>
+                            <div class="card" style="flex: 1; border: 2px solid var(--primary-light); background: rgba(33,150,243,0.05);">
+                                <h2 class="text-center">🫧 Oksigen (O₂)</h2>
+                                <p>Gas yang sangat penting! Tumbuhan membuang oksigen ke udara. Gas inilah yang kita (manusia dan hewan) hirup untuk bernapas setiap detik.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2 mt-2">
+                        <button class="btn" onclick="goToPage(4)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(6)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 6: PENTINGNYA BAGI TUMBUHAN -->
+                <section id="page-6" class="page">
+                    <div class="card mb-2">
+                        <h1>🌱 Pentingnya Fotosintesis bagi Tumbuhan</h1>
+                        <div class="options-grid mt-2">
+                            <div class="card text-center shadow-none">
+                                <h1 style="font-size: 3rem; margin:0;">🍽️</h1>
+                                <h3>Bertahan Hidup</h3>
+                                <p>Tumbuhan tidak bisa berburu makanan. Fotosintesis adalah satu-satunya cara mereka mendapatkan energi.</p>
+                            </div>
+                            <div class="card text-center shadow-none">
+                                <h1 style="font-size: 3rem; margin:0;">📈</h1>
+                                <h3>Tumbuh Besar</h3>
+                                <p>Energi dari glukosa digunakan untuk menumbuhkan daun baru, meninggikan batang, dan memanjangkan akar.</p>
+                            </div>
+                            <div class="card text-center shadow-none">
+                                <h1 style="font-size: 3rem; margin:0;">🍎</h1>
+                                <h3>Menyimpan Cadangan</h3>
+                                <p>Membentuk buah-buahan manis, umbi-umbian, dan biji-bijian sebagai tabungan makanan.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2 mt-2">
+                        <button class="btn" onclick="goToPage(5)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(7)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 7: MANFAAT BAGI MAKHLUK HIDUP -->
+                <section id="page-7" class="page">
+                    <div class="card mb-2">
+                        <h1>🌎 Manfaat Fotosintesis bagi Makhluk Hidup</h1>
+                        <p class="text-xl">Tumbuhan adalah <strong>Pahlawan Bumi</strong>! Tanpa mereka, kehidupan di bumi akan musnah.</p>
+                        
+                        <ul style="font-size: 1.2rem; line-height: 2; margin-left: 20px; margin-top: 16px;">
+                            <li><strong>Pabrik Oksigen:</strong> Menghasilkan udara bersih agar manusia dan hewan bisa bernapas.</li>
+                            <li><strong>Sumber Makanan Utama:</strong> Memulai rantai makanan. Sapi makan rumput, manusia makan daging sapi dan sayuran.</li>
+                            <li><strong>Pembersih Udara:</strong> Menyerap Karbon Dioksida yang kotor dan beracun dari udara.</li>
+                            <li><strong>Menyejukkan Lingkungan:</strong> Membuat suasana rindang dan mengurangi pemanasan global.</li>
+                        </ul>
+                    </div>
+                    <div class="pid-stimulus">
+                        <h3>🎤 Diskusi Kelas</h3>
+                        <p style="font-size: 1.3rem;">"Bayangkan jika semua tumbuhan di bumi tiba-tiba menghilang. Bagaimana nasib manusia dan hewan?"</p>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2 mt-2">
+                        <button class="btn" onclick="goToPage(6)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-primary" onclick="goToPage(8)">Selanjutnya ➔</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 8: FAKTOR PENGARUH -->
+                <section id="page-8" class="page">
+                    <div class="card mb-2">
+                        <h1>⚙️ Faktor yang Mempengaruhi Fotosintesis</h1>
+                        <p class="mb-2">Kecepatan tumbuhan memasak makanan dipengaruhi oleh beberapa hal:</p>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            <div class="card" style="flex:1; min-width: 200px; text-align: center;">
+                                <h3>☀️ Intensitas Cahaya</h3>
+                                <p>Makin banyak cahaya, makin cepat fotosintesis (sampai batas tertentu).</p>
+                            </div>
+                            <div class="card" style="flex:1; min-width: 200px; text-align: center;">
+                                <h3>🌡️ Suhu</h3>
+                                <p>Tumbuhan butuh suhu hangat yang pas. Terlalu dingin atau panas bisa merusak prosesnya.</p>
+                            </div>
+                            <div class="card" style="flex:1; min-width: 200px; text-align: center;">
+                                <h3>💧 Ketersediaan Air</h3>
+                                <p>Jika kekeringan, mulut daun (stomata) menutup, CO2 tidak bisa masuk.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between flex-wrap gap-2 mt-2">
+                        <button class="btn" onclick="goToPage(7)">⬅️ Sebelumnya</button>
+                        <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                        <button class="btn btn-accent" onclick="goToPage(9)" style="font-size: 1.2rem;">🎮 Mulai Latihan Interaktif!</button>
+                    </div>
+                </section>
+
+                <!-- PAGE 9: LATIHAN INTERAKTIF -->
+                <section id="page-9" class="page">
+                    <div class="card text-center mb-2" id="quiz-intro">
+                        <h1>📝 Latihan Interaktif</h1>
+                        <p>Uji pemahamanmu tentang Fotosintesis. Dapatkan skor minimal 80 untuk meraih Badge Ahli Fotosintesis!</p>
+                        <div class="flex justify-center gap-2 mt-2 flex-wrap">
+                            <button class="btn" onclick="goToPage(0)">🏠 Beranda</button>
+                            <button class="btn btn-primary text-xl" onclick="startQuiz()">Mulai Kuis</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-container" class="hidden card mb-2">
+                        <div class="flex justify-between mb-2 border-bottom">
+                            <h2 id="quiz-title">Soal</h2>
+                            <h2 style="color: var(--accent);">Skor: <span id="current-score">0</span></h2>
+                        </div>
+                        
+                        <!-- Quiz Type A: Benar/Salah -->
+                        <div id="q-tf" class="quiz-section">
+                            <h3 id="tf-question" class="text-xl text-center mt-4"></h3>
+                            <div class="flex justify-center gap-2 mt-4">
+                                <button class="btn btn-primary" style="background: var(--success); width: 120px;" onclick="answerTF(true)">✅ Benar</button>
+                                <button class="btn btn-primary" style="background: var(--error); width: 120px;" onclick="answerTF(false)">❌ Salah</button>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Type B: Mencocokkan -->
+                        <div id="q-match" class="quiz-section">
+                            <p class="text-center text-muted">Ketuk item di sebelah kiri, lalu ketuk pasangannya di sebelah kanan!</p>
+                            <div class="match-container mt-2">
+                                <div class="match-col" id="match-left"></div>
+                                <div class="match-col" id="match-right"></div>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Type C: Drag & Drop -->
+                        <div id="q-dnd" class="quiz-section">
+                            <p class="text-center text-muted">Pilih bahan di bawah, lalu masukkan ke kotak target!</p>
+                            <div class="sort-container justify-center" id="dnd-items">
+                                <div class="drag-item" onclick="selectDnd('☀️ Matahari')">☀️ Matahari</div>
+                                <div class="drag-item" onclick="selectDnd('💧 Air')">💧 Air</div>
+                                <div class="drag-item" onclick="selectDnd('🌫️ CO₂')">🌫️ CO₂</div>
+                            </div>
+                            <div class="options-grid">
+                                <div class="drop-zone" onclick="placeDnd('Sumber Energi')">Sumber Energi<br><span class="text-muted">(Pilih & Ketuk Kesini)</span></div>
+                                <div class="drop-zone" onclick="placeDnd('Dari Tanah')">Dari Tanah<br><span class="text-muted">(Pilih & Ketuk Kesini)</span></div>
+                                <div class="drop-zone" onclick="placeDnd('Dari Udara')">Dari Udara<br><span class="text-muted">(Pilih & Ketuk Kesini)</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Quiz Type D: Susun Kata -->
+                        <div id="q-sort" class="quiz-section">
+                            <p class="text-center text-muted">Ketuk kata secara berurutan untuk menyusun kalimat yang benar!</p>
+                            <div class="sort-container" id="sort-source"></div>
+                            <h4 class="mt-4">Jawabanmu:</h4>
+                            <div class="sort-container" id="sort-target" style="background: rgba(13, 71, 161, 0.1);"></div>
+                            <div class="flex justify-center mt-2 gap-2">
+                                <button class="btn" onclick="resetSort()">Ulangi Susunan</button>
+                                <button class="btn btn-primary" onclick="checkSort()">Cek Jawaban</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Quiz Result -->
+                    <div id="quiz-result" class="hidden card text-center">
+                        <h1>Hasil Latihan</h1>
+                        <h1 style="font-size: 4rem; color: var(--primary);" id="final-score-text">0</h1>
+                        <p class="text-xl">Benar: <span id="correct-count">0</span> | Salah: <span id="wrong-count">0</span></p>
+                        <div id="badge-container" class="hidden mt-2 mb-2">
+                            <div style="font-size: 4rem;">🏆</div>
+                            <h2 style="color: var(--accent);">Selamat! Anda mendapatkan Badge "Ahli Fotosintesis"</h2>
+                            <button class="btn btn-primary mt-2" onclick="printCertificate()">Unduh Sertifikat</button>
+                        </div>
+                        <button class="btn mt-4" onclick="goToPage(0)">🏠 Kembali ke Beranda</button>
+                        <button class="btn btn-accent mt-4" onclick="goToPage(9); startQuiz();">Ulangi Latihan</button>
+                    </div>
+
+                </section>
+
+                <!-- PAGE 10: PENGEMBANG -->
+                <section id="page-10" class="page">
+                    <div class="card text-center mb-2" style="max-width: 600px; margin: 0 auto;">
+                        <h1 class="mb-4">👩‍🏫 Profil Pengembang</h1>
+                        
+                        <div style="width: 150px; height: 150px; background: var(--primary-light); border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; border: 4px solid var(--accent); overflow: hidden;">
+                            <svg width="100" height="100" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        
+                        <h2 class="mt-4" style="color: var(--primary-dark);">Roza Naulia Rosdianti</h2>
+                        <p class="badge mb-2">Guru Sekolah Dasar</p>
+                        <p><strong>Spesialis Media Pembelajaran Interaktif<br>dan Pemanfaatan Papan Interaktif Digital (PID)</strong></p>
+                        
+                        <div style="background: var(--bg-light); padding: 16px; border-radius: 8px; margin-top: 24px; text-align: left;">
+                            <p><em>"Pendidikan bukan hanya tentang mengisi ember, tetapi tentang menyalakan api. Melalui media interaktif, mari kita nyalakan rasa ingin tahu anak-anak kita tentang keajaiban alam semesta."</em></p>
+                        </div>
+                        
+                        <div class="flex justify-center gap-2 mt-4">
+                            <span class="btn btn-icon">📧</span>
+                            <span class="btn btn-icon">🌐</span>
+                            <span class="btn btn-icon">📱</span>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-primary" onclick="goToPage(0)">🏠 Kembali ke Beranda</button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- PID Tools Floating Buttons -->
+    <div class="floating-tools">
+        <button class="btn btn-icon" style="width: 56px; height: 56px; background: var(--accent); color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" onclick="openPIDModal()" title="Mode Papan Interaktif (PID)">📊</button>
+    </div>
+
+    <!-- PID Modal -->
+    <div class="modal-overlay" id="pid-modal">
+        <div class="modal-content text-center">
+            <h2 class="mb-2">📊 Mode Papan Interaktif</h2>
+            <div class="flex flex-wrap justify-center gap-2 mb-4">
+                <button class="btn" onclick="startVoting()">Buka Voting Jawaban</button>
+                <button class="btn" onclick="closeModal('pid-modal')">Tutup</button>
+            </div>
+            
+            <div id="voting-area" class="hidden">
+                <h3>Voting Real-Time</h3>
+                <p class="text-muted mb-2">Ketuk batang grafik untuk menambah suara kelas.</p>
+                <canvas id="votingChart" width="400" height="250" style="background: white; border: 1px solid #ccc; border-radius: 8px; max-width: 100%; cursor: pointer;"></canvas>
+                <div class="flex justify-center gap-2 mt-2">
+                    <button class="btn" onclick="resetVoting()">Reset Voting</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate Modal (Hidden, used for Print) -->
+    <div id="cert-print" style="display: none;"></div>
+
+    <script>
+        /* */
+        const totalPages = 10;
+        let state = {
+            currentPage: 0,
+            unlockedPages: [0],
+            darkMode: false,
+            score: 0
+        };
+
+        const pagesData = [
+            { id: 0, title: "🏠 Beranda", icon: "🏠" },
+            { id: 1, title: "📘 Pengertian Fotosintesis", icon: "📘" },
+            { id: 2, title: "🌿 Tempat Terjadinya", icon: "🌿" },
+            { id: 3, title: "☀️ Bahan Dibutuhkan", icon: "☀️" },
+            { id: 4, title: "🔄 Proses Fotosintesis", icon: "🔄" },
+            { id: 5, title: "🍃 Hasil Fotosintesis", icon: "🍃" },
+            { id: 6, title: "🌱 Pentingnya Bagi Tumbuhan", icon: "🌱" },
+            { id: 7, title: "🌎 Manfaat Bagi Makhluk", icon: "🌎" },
+            { id: 8, title: "⚙️ Faktor Pengaruh", icon: "⚙️" },
+            { id: 9, title: "📝 Latihan Interaktif", icon: "📝" },
+            { id: 10, title: "👩‍🏫 Pengembang", icon: "👩‍🏫" }
+        ];
+
+        window.onload = () => {
+            loadState();
+            renderSidebar();
+            updateUI();
+            startClock();
+            
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 1000);
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('fotosintesisState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.unlockedPages = parsed.unlockedPages || [0];
+                state.darkMode = parsed.darkMode || false;
+                if(state.darkMode) document.body.setAttribute('data-theme', 'dark');
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('fotosintesisState', JSON.stringify({
+                unlockedPages: state.unlockedPages,
+                darkMode: state.darkMode
+            }));
+            updateProgressUI();
+        }
+
+        function resetProgress() {
+            if(confirm("Apakah Anda yakin ingin menghapus semua progress belajar?")) {
+                state.unlockedPages = [0];
+                saveState();
+                goToPage(0);
+                alert("Progress berhasil direset!");
+            }
+        }
+
+        function renderSidebar() {
+            const menu = document.getElementById('navMenu');
+            menu.innerHTML = '';
+            pagesData.forEach(page => {
+                const item = document.createElement('div');
+                item.className = `nav-item ${state.currentPage === page.id ? 'active' : ''}`;
+                if (state.unlockedPages.includes(page.id) || page.id === 10) {
+                    item.onclick = () => goToPage(page.id);
+                    item.innerHTML = `<span>${page.icon}</span> <span>${page.title.replace(/[^a-zA-Z\s]/g, '')}</span>`;
+                } else {
+                    item.style.opacity = '0.5';
+                    item.style.cursor = 'not-allowed';
+                    item.innerHTML = `<span>🔒</span> <span>${page.title.replace(/[^a-zA-Z\s]/g, '')}</span>`;
+                }
+                menu.appendChild(item);
+            });
+        }
+
+        function goToPage(id) {
+            playSound('click');
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page-${id}`).classList.add('active');
+            
+            state.currentPage = id;
+            if (!state.unlockedPages.includes(id) && id !== 10) {
+                state.unlockedPages.push(id);
+                saveState();
+            }
+            
+            renderSidebar();
+            
+            if (window.innerWidth <= 900) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+            
+            document.getElementById('content-area').scrollTop = 0;
+        }
+
+        function startLearning() {
+            const maxUnlocked = Math.max(...state.unlockedPages.filter(p => p < 9));
+            if (maxUnlocked === 0) goToPage(1);
+            else goToPage(maxUnlocked);
+        }
+
+        function updateProgressUI() {
+            const count = state.unlockedPages.filter(p => p > 0 && p < 10).length;
+            const pct = Math.round((count / 9) * 100);
+            
+            const bar = document.getElementById('main-progress');
+            if(bar) bar.style.width = pct + '%';
+            
+            const txt = document.getElementById('progress-text');
+            if(txt) txt.innerText = `Materi Dipelajari: ${count}/9`;
+            
+            const pctTxt = document.getElementById('progress-percent');
+            if(pctTxt) pctTxt.innerText = `${pct}%`;
+        }
+
+        function updateUI() {
+            updateProgressUI();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            playSound('click');
+        }
+
+        function toggleTheme() {
+            state.darkMode = !state.darkMode;
+            if (state.darkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+            } else {
+                document.body.removeAttribute('data-theme');
+            }
+            saveState();
+            playSound('click');
+        }
+
+        function toggleFullscreen() {
+            playSound('click');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function revealText(id) {
+            playSound('click');
+            const el = document.getElementById(id);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                el.style.animation = 'fadeIn 0.5s ease';
+            }
+        }
+
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('realtime-clock').innerText = timeString;
+            }, 1000);
+        }
+
+        /* */
+        let simState = { cahaya: false, air: false, co2: false };
+        function toggleSim(type) {
+            simState[type] = !simState[type];
+            const btn = document.getElementById(`btn-${type}`);
+            btn.classList.toggle('active');
+            
+            playSound(simState[type] ? 'click' : 'fail');
+
+            const res = document.getElementById('sim-result');
+            const leaf = document.getElementById('sim-leaf');
+            
+            if (simState.cahaya && simState.air && simState.co2) {
+                res.innerHTML = "✨ Fotosintesis Berhasil! ✨<br><span style='font-size:1rem;color:var(--success)'>Menghasilkan Glukosa & Oksigen</span>";
+                res.style.color = 'var(--success)';
+                leaf.setAttribute('fill', '#4CAF50');
+                playSound('success');
+                createLeaves();
+            } else {
+                leaf.setAttribute('fill', '#9E9E9E');
+                res.style.color = 'var(--text-muted)';
+                let missing = [];
+                if(!simState.cahaya) missing.push("Cahaya");
+                if(!simState.air) missing.push("Air");
+                if(!simState.co2) missing.push("CO₂");
+                res.innerHTML = "Fotosintesis Belum Sempurna.<br><span style='font-size:1rem'>Kurang: " + missing.join(", ") + "</span>";
+            }
+        }
+
+        function createLeaves() {
+            const container = document.getElementById('particles');
+            for(let i=0; i<15; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.style.left = Math.random() * 100 + 'vw';
+                leaf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                leaf.style.opacity = Math.random();
+                container.appendChild(leaf);
+                
+                setTimeout(() => { leaf.remove(); }, 5000);
+            }
+        }
+
+        /* */
+        const quizData = {
+            tf: [
+                { q: "Tumbuhan hijau membuat makanan sendiri melalui proses fotosintesis.", a: true },
+                { q: "Fotosintesis terjadi pada malam hari tanpa bantuan cahaya.", a: false },
+                { q: "Klorofil adalah zat hijau daun yang menangkap cahaya matahari.", a: true },
+                { q: "Hasil dari fotosintesis adalah karbon dioksida dan air.", a: false }
+            ],
+            match: [
+                { l: "Cahaya Matahari", r: "Sumber energi utama" },
+                { l: "Air", r: "Diserap oleh akar" },
+                { l: "Karbon Dioksida", r: "Gas dari udara" },
+                { l: "Oksigen", r: "Dihirup manusia" }
+            ],
+            sort: ["Fotosintesis", "adalah", "proses", "tumbuhan", "membuat", "makanan"]
+        };
+
+        let currentQuizPhase = 0; 
+        let tfIndex = 0;
+        let quizScore = 0;
+        let quizMax = 100;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+
+        function startQuiz() {
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            
+            quizScore = 0; correctAnswers = 0; wrongAnswers = 0;
+            currentQuizPhase = 0; tfIndex = 0;
+            updateScoreUI();
+            loadQuizPhase();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('current-score').innerText = quizScore;
+        }
+
+        function loadQuizPhase() {
+            document.querySelectorAll('.quiz-section').forEach(s => s.classList.remove('active'));
+            
+            if (currentQuizPhase === 0) { 
+                document.getElementById('q-tf').classList.add('active');
+                document.getElementById('quiz-title').innerText = `Bagian 1: Benar atau Salah (${tfIndex + 1}/${quizData.tf.length})`;
+                document.getElementById('tf-question').innerText = quizData.tf[tfIndex].q;
+            } 
+            else if (currentQuizPhase === 1) { 
+                document.getElementById('q-match').classList.add('active');
+                document.getElementById('quiz-title').innerText = `Bagian 2: Pasangkan Kata`;
+                setupMatch();
+            }
+            else if (currentQuizPhase === 2) { 
+                document.getElementById('q-dnd').classList.add('active');
+                document.getElementById('quiz-title').innerText = `Bagian 3: Masukkan ke Kotak`;
+                setupDnd();
+            }
+            else if (currentQuizPhase === 3) { 
+                document.getElementById('q-sort').classList.add('active');
+                document.getElementById('quiz-title').innerText = `Bagian 4: Susun Kalimat`;
+                setupSort();
+            }
+            else { 
+                showQuizResult();
+            }
+        }
+
+        function answerTF(ans) {
+            const isCorrect = (ans === quizData.tf[tfIndex].a);
+            handleAnswerResult(isCorrect, 10);
+            
+            tfIndex++;
+            if (tfIndex < quizData.tf.length) {
+                setTimeout(loadQuizPhase, 500);
+            } else {
+                currentQuizPhase++;
+                setTimeout(loadQuizPhase, 1000);
+            }
+        }
+
+        let matchSelectedLeft = null;
+        let matchLefts = []; let matchRights = [];
+        let matchCompleted = 0;
+
+        function setupMatch() {
+            matchLefts = [...quizData.match].sort(() => Math.random() - 0.5);
+            matchRights = [...quizData.match].sort(() => Math.random() - 0.5);
+            matchCompleted = 0;
+
+            const lCont = document.getElementById('match-left');
+            const rCont = document.getElementById('match-right');
+            lCont.innerHTML = ''; rCont.innerHTML = '';
+
+            matchLefts.forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = 'match-item'; div.innerText = m.l; div.dataset.val = m.l;
+                div.onclick = () => selectMatchL(div);
+                lCont.appendChild(div);
+            });
+            matchRights.forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = 'match-item'; div.innerText = m.r; div.dataset.val = m.r;
+                div.onclick = () => selectMatchR(div);
+                rCont.appendChild(div);
+            });
+        }
+
+        function selectMatchL(el) {
+            if(el.classList.contains('matched')) return;
+            playSound('click');
+            document.querySelectorAll('#match-left .match-item').forEach(d => d.classList.remove('selected'));
+            el.classList.add('selected');
+            matchSelectedLeft = el;
+        }
+
+        function selectMatchR(el) {
+            if(!matchSelectedLeft || el.classList.contains('matched')) return;
+            
+            const lVal = matchSelectedLeft.dataset.val;
+            const rVal = el.dataset.val;
+            
+            const isCorrect = quizData.match.find(m => m.l === lVal && m.r === rVal);
+            
+            if(isCorrect) {
+                matchSelectedLeft.classList.replace('selected', 'matched');
+                el.classList.add('matched');
+                matchSelectedLeft = null;
+                matchCompleted++;
+                handleAnswerResult(true, 5);
+                
+                if(matchCompleted === quizData.match.length) {
+                    currentQuizPhase++;
+                    setTimeout(loadQuizPhase, 1500);
+                }
+            } else {
+                handleAnswerResult(false, 0);
+                matchSelectedLeft.classList.remove('selected');
+                matchSelectedLeft = null;
+            }
+        }
+
+        /* */
+        let selectedDndItem = null;
+        let dndCompleted = 0;
+        const dndAnswers = {
+            'Sumber Energi': '☀️ Matahari',
+            'Dari Tanah': '💧 Air',
+            'Dari Udara': '🌫️ CO₂'
+        };
+
+        function setupDnd() {
+            dndCompleted = 0;
+            selectedDndItem = null;
+            document.querySelectorAll('.drop-zone').forEach(dz => {
+                dz.innerHTML = dz.innerText.split('\n')[0] + '<br><span class="text-muted">(Pilih & Ketuk Kesini)</span>';
+                dz.classList.remove('matched');
+                dz.style.borderColor = '';
+            });
+            document.getElementById('dnd-items').innerHTML = `
+                <div class="drag-item" onclick="selectDnd('☀️ Matahari', this)">☀️ Matahari</div>
+                <div class="drag-item" onclick="selectDnd('💧 Air', this)">💧 Air</div>
+                <div class="drag-item" onclick="selectDnd('🌫️ CO₂', this)">🌫️ CO₂</div>
+            `;
+        }
+
+        function selectDnd(val, el) {
+            playSound('click');
+            document.querySelectorAll('.drag-item').forEach(d => d.style.transform = 'scale(1)');
+            el.style.transform = 'scale(1.1)';
+            selectedDndItem = {val: val, el: el};
+        }
+
+        function placeDnd(zone) {
+            if(!selectedDndItem) return;
+            
+            if(dndAnswers[zone] === selectedDndItem.val) {
+                handleAnswerResult(true, 10);
+                event.currentTarget.innerHTML = `<strong>${zone}</strong><br><span style="color:var(--success)">${selectedDndItem.val}</span>`;
+                event.currentTarget.style.borderColor = 'var(--success)';
+                selectedDndItem.el.remove();
+                selectedDndItem = null;
+                dndCompleted++;
+                
+                if(dndCompleted === 3) {
+                    currentQuizPhase++;
+                    setTimeout(loadQuizPhase, 1500);
+                }
+            } else {
+                handleAnswerResult(false, 0);
+                selectedDndItem.el.style.transform = 'scale(1)';
+                selectedDndItem = null;
+            }
+        }
+
+        let sortTargetArr = [];
+        let sortSourceArr = [];
+        function setupSort() {
+            sortSourceArr = [...quizData.sort].sort(() => Math.random() - 0.5);
+            sortTargetArr = [];
+            renderSort();
+        }
+
+        function renderSort() {
+            const src = document.getElementById('sort-source');
+            const tgt = document.getElementById('sort-target');
+            src.innerHTML = ''; tgt.innerHTML = '';
+            
+            sortSourceArr.forEach((word, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-primary'; btn.innerText = word;
+                btn.onclick = () => {
+                    playSound('click');
+                    sortTargetArr.push(word);
+                    sortSourceArr.splice(i, 1);
+                    renderSort();
+                };
+                src.appendChild(btn);
+            });
+            
+            sortTargetArr.forEach((word, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn'; btn.innerText = word;
+                btn.onclick = () => {
+                    playSound('click');
+                    sortSourceArr.push(word);
+                    sortTargetArr.splice(i, 1);
+                    renderSort();
+                };
+                tgt.appendChild(btn);
+            });
+        }
+
+        function resetSort() {
+            playSound('click');
+            setupSort();
+        }
+
+        function checkSort() {
+            const ansStr = sortTargetArr.join(' ');
+            const corStr = quizData.sort.join(' ');
+            if (ansStr === corStr) {
+                handleAnswerResult(true, 10);
+                currentQuizPhase++;
+                setTimeout(loadQuizPhase, 1500);
+            } else {
+                handleAnswerResult(false, 0);
+            }
+        }
+
+        function handleAnswerResult(isCorrect, points) {
+            if(isCorrect) {
+                playSound('success');
+                quizScore += points;
+                correctAnswers++;
+                createLeaves();
+            } else {
+                playSound('fail');
+                wrongAnswers++;
+            }
+            updateScoreUI();
+        }
+
+        function showQuizResult() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            const res = document.getElementById('quiz-result');
+            res.classList.remove('hidden');
+            
+            document.getElementById('final-score-text').innerText = quizScore;
+            document.getElementById('correct-count').innerText = correctAnswers;
+            document.getElementById('wrong-count').innerText = wrongAnswers;
+            
+            if (quizScore >= 80) {
+                playSound('success');
+                document.getElementById('badge-container').classList.remove('hidden');
+            } else {
+                document.getElementById('badge-container').classList.add('hidden');
+            }
+        }
+
+        function printCertificate() {
+            const date = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+            const printContent = `
+                <div style="font-family: Arial, sans-serif; text-align: center; border: 10px solid #0d47a1; padding: 50px; width: 800px; margin: 0 auto; background: #f4f7fb;">
+                    <h1 style="color: #0d47a1; font-size: 3rem; margin-bottom: 10px;">SERTIFIKAT PENGHARGAAN</h1>
+                    <h2 style="color: #ffb300; font-size: 2rem; margin-bottom: 40px;">🏆 Ahli Fotosintesis</h2>
+                    <p style="font-size: 1.5rem; margin-bottom: 20px;">Diberikan kepada:</p>
+                    <h2 style="font-size: 2.5rem; text-decoration: underline; margin-bottom: 20px;">Siswa Hebat Kelas 5</h2>
+                    <p style="font-size: 1.2rem; line-height: 1.5;">Atas keberhasilannya menyelesaikan materi dan mendapatkan skor sempurna pada Media Pembelajaran Interaktif Fotosintesis Tumbuhan Hijau.</p>
+                    <div style="margin-top: 50px; text-align: right;">
+                        <p style="font-size: 1.2rem;">${date}</p>
+                        <p style="font-size: 1.2rem; font-weight: bold; margin-top: 50px;">Roza Naulia Rosdianti</p>
+                        <p style="font-size: 1rem; color: #666;">Pengembang Media</p>
+                    </div>
+                </div>
+            `;
+            
+            const w = window.open('', '_blank');
+            w.document.write('<html><head><title>Sertifikat Fotosintesis</title></head><body style="display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">');
+            w.document.write(printContent);
+            w.document.write('</body></html>');
+            w.document.close();
+            setTimeout(() => { w.print(); }, 500);
+        }
+
+        /* */
+        function openPIDModal() {
+            document.getElementById('pid-modal').classList.add('active');
+            playSound('click');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            playSound('click');
+        }
+
+        let votes = { A: 0, B: 0, C: 0, D: 0 };
+        function startVoting() {
+            playSound('click');
+            document.getElementById('voting-area').classList.remove('hidden');
+            drawChart();
+            
+            const canvas = document.getElementById('votingChart');
+            canvas.onclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const width = canvas.width;
+                const barWidth = width / 4;
+                
+                if(x < barWidth) votes.A++;
+                else if(x < barWidth*2) votes.B++;
+                else if(x < barWidth*3) votes.C++;
+                else votes.D++;
+                
+                playSound('click');
+                drawChart();
+            };
+        }
+
+        function resetVoting() {
+            votes = { A: 0, B: 0, C: 0, D: 0 };
+            playSound('fail');
+            drawChart();
+        }
+
+        function drawChart() {
+            const canvas = document.getElementById('votingChart');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 30;
+            const colors = ['#e53935', '#43a047', '#1e88e5', '#ffb300'];
+            const labels = ['A', 'B', 'C', 'D'];
+            const keys = Object.keys(votes);
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const maxVote = Math.max(...Object.values(votes), 10);
+            const barWidth = (width - padding*2) / 4 - 20;
+            
+            keys.forEach((key, index) => {
+                const vote = votes[key];
+                const barHeight = (vote / maxVote) * (height - padding*2);
+                const x = padding + 10 + index * (barWidth + 20);
+                const y = height - padding - barHeight;
+                
+                ctx.fillStyle = colors[index];
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(labels[index], x + barWidth/2, height - 10);
+                ctx.fillText(vote, x + barWidth/2, y - 5);
+            });
+            
+            ctx.beginPath();
+            ctx.moveTo(padding, 10);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - 10, height - padding);
+            ctx.stroke();
+        }
+
+        /* */
+        let audioCtx = null;
+        let isAudioEnabled = false; // Off by default until clicked
+        let bgmInterval = null;
+        let currentStep = 0;
+        const tempo = 115; // BPM
+        const stepDuration = 60 / tempo / 2; // Eighth Notes
+
+        // Upbeat, educational harmonic progression
+        const chords = [
+            [261.63, 329.63, 392.00], // C Maj
+            [293.66, 349.23, 440.00], // F Maj
+            [293.66, 392.00, 493.88], // G Maj
+            [261.63, 329.63, 392.00]  // C Maj
+        ];
+        const bassNotes = [130.81, 174.61, 196.00, 130.81]; // C2, F2, G2, C2
+        const melody = [
+            329.63, 392.00, 523.25, 392.00, 440.00, 349.23, 261.63, 293.66,
+            329.63, 392.00, 440.00, 523.25, 392.00, 329.63, 293.66, 261.63
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        let nextNoteTime = 0.0;
+        function scheduler() {
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                scheduleNote(currentStep, nextNoteTime);
+                nextStep();
+            }
+        }
+
+        function nextStep() {
+            nextNoteTime += stepDuration;
+            currentStep = (currentStep + 1) % 32; // 4 bars x 8 eighth-notes
+        }
+
+        function playSynthTone(freq, type, vol, duration, time) {
+            if (!isAudioEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, time);
+            
+            gainNode.gain.setValueAtTime(vol, time);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, time + duration);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start(time);
+            osc.stop(time + duration);
+        }
+
+        function scheduleNote(step, time) {
+            const bar = Math.floor(step / 8);
+            const stepInBar = step % 8;
+
+            // 1. Bassline (Upbeat & bouncy rhythm)
+            if (stepInBar === 0 || stepInBar === 4 || stepInBar === 6) {
+                playSynthTone(bassNotes[bar], 'triangle', 0.15, 0.4, time);
+            }
+
+            // 2. Chords Arpeggios (Cheerfully backing the track)
+            const currentChord = chords[bar];
+            const noteIndex = step % 3;
+            playSynthTone(currentChord[noteIndex], 'sine', 0.05, 0.25, time);
+
+            // 3. Cute, Melodic Tune
+            if (stepInBar % 2 === 0) {
+                const melNote = melody[step % 16];
+                playSynthTone(melNote, 'sine', 0.07, 0.3, time);
+            }
+        }
+
+        function startBGM() {
+            if (!audioCtx) initAudio();
+            if (bgmInterval) return;
+            currentStep = 0;
+            nextNoteTime = audioCtx.currentTime;
+            bgmInterval = setInterval(scheduler, 25);
+        }
+
+        function stopBGM() {
+            if (bgmInterval) {
+                clearInterval(bgmInterval);
+                bgmInterval = null;
+            }
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btnAudio');
+            btn.innerText = isAudioEnabled ? '🔊' : '🔇';
+            btn.title = isAudioEnabled ? 'Matikan Suara' : 'Nyalakan Suara';
+            
+            if (isAudioEnabled) {
+                startBGM();
+                playSound('click');
+            } else {
+                stopBGM();
+            }
+        }
+
+        function playSound(type) {
+            if (!isAudioEnabled) return;
+            initAudio();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            const now = audioCtx.currentTime;
+            
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } 
+            else if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.setValueAtTime(500, now + 0.1);
+                osc.frequency.setValueAtTime(600, now + 0.2);
+                osc.frequency.setValueAtTime(800, now + 0.3);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+            else if (type === 'fail') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        // BGM starts immediately upon first tap anywhere to meet security sandbox policies
+        document.body.addEventListener('click', () => {
+            initAudio();
+        }, {once:true});
+
+    </script>
+</body>
+</html>
